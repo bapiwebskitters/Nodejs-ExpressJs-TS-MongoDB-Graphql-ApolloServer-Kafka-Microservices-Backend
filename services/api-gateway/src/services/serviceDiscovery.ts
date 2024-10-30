@@ -55,24 +55,23 @@ export class ServiceDiscovery {
     }
   }
 
-  async getServiceUrl(serviceName: string): Promise<string | null> {
+  async getServiceUrl(serviceName: string): Promise<string> {
     const key = `/services/${serviceName}`;
-    console.log("key =======", key);
-    
+
     try {
       const serviceData = await this.etcd.get(key).string();
       console.log("=============serviceData===========", serviceData);
-      
+
       if (serviceData) {
         const service: SubgraphConfig = JSON.parse(serviceData);
         return service.url;
       } else {
         console.warn(`Service ${serviceName} not found in registry.`);
-        return null;
+        throw new Error(`Service ${serviceName} not found in registry.`);
       }
     } catch (error) {
       console.error(`Failed to get URL for service ${serviceName}:`, error);
-      return null;
+      throw error;
     }
   }
 

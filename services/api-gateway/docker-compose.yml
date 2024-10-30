@@ -7,7 +7,7 @@ services:
     command: etcd --advertise-client-urls http://0.0.0.0:2379 --listen-client-urls http://0.0.0.0:2379
 
   api-gateway:
-    build: .
+    image: your-api-gateway-image:latest 
     environment:
       - ETCD_HOSTS=etcd:2379
     depends_on:

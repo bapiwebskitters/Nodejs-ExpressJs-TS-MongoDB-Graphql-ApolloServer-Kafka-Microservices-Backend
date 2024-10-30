@@ -11,26 +11,23 @@ const gatewayConfig: GatewayConfig = {
   subgraphs: [
     {
       name: "user",
-      url: "http://localhost:4001/graphql",
-      baseUrl: "http://localhost:4001/health",
+      url: "http://localhost:4001",
       instances: [
-        "http://localhost:4001/graphql", // Primary instance
+        "http://localhost:4001", // Primary instance
       ],
     },
     {
       name: "product",
-      url: "http://localhost:4002/graphql",
-      baseUrl: "http://localhost:4002/health",
+      url: "http://localhost:4002",
       instances: [
-        "http://localhost:4002/graphql", // Primary instance
+        "http://localhost:4002", // Primary instance
       ],
     },
     {
       name: "notification",
-      url: "http://localhost:4003/graphql",
-      baseUrl: "http://localhost:4003/health",
+      url: "http://localhost:4003",
       instances: [
-        "http://localhost:4003/graphql", // Primary instance
+        "http://localhost:4003", // Primary instance
       ],
     },
   ],

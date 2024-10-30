@@ -1,6 +1,6 @@
+// services/loadBalancer.ts
 import { ServiceError, SubgraphConfig } from "../types";
 
-// services/loadBalancer.ts
 export class LoadBalancer {
   private currentIndex: Map<string, number>;
   private instanceHealth: Map<string, boolean>;

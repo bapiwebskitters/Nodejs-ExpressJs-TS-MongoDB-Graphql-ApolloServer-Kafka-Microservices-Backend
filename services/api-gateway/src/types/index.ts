@@ -7,7 +7,7 @@ import { RedisClientType } from "redis";
 export interface SubgraphConfig {
   name: string;
   url: string;
-  baseUrl: string;
+  baseUrl?: string;
   weight?: number; // for weighted load balancing
   instances?: string[]; // multiple instances for load balancing
 }

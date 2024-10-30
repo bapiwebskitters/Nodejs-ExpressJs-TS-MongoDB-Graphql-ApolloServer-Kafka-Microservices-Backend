@@ -10,7 +10,6 @@ import { MetricsService } from "./metrics";
 import { RateLimitService } from "./rateLimit";
 import { RetryService } from "./retry";
 import { ServiceDiscovery } from "./serviceDiscovery";
-import { GraphQLError } from "graphql";
 import dotenv from "dotenv";
 import cors from "cors";
 import { json } from "body-parser";
@@ -45,10 +44,21 @@ export class GatewayService {
       url: service.url,
     }));
 
+    const subgraphConfigs1 = services.map((service) => ({
+      name: service.name,
+      url: `${service.url}/graphql`,
+    }));
+
+    // Register each service with ServiceDiscovery
+    console.log("=========== SERVICE REGISTERED START ============");
+    subgraphConfigs.forEach((service) => {
+      this.serviceDiscovery.registerService(service);
+    });
+
     // Create a new ApolloGateway with updated subgraph URLs
     const gateway = new ApolloGateway({
       supergraphSdl: new IntrospectAndCompose({
-        subgraphs: subgraphConfigs,
+        subgraphs: subgraphConfigs1,
       }),
     });
 
@@ -59,14 +69,13 @@ export class GatewayService {
     this.server = new ApolloServer({ gateway });
     await this.server.start(); // Start the new server
     console.log("Apollo Gateway updated with new service URLs.");
+    console.log("=========== SERVICE REGISTERED END ============");
   }
 
   private async checkSubgraphHealth(): Promise<void> {
     const healthChecks = await Promise.all(
       this.config.subgraphs.map(async (subgraph) => {
         const url = await this.serviceDiscovery.getServiceUrl(subgraph.name);
-        console.log("Checking URL for service:", subgraph.name, url);
-
         if (!url) {
           this.metricsService.recordServiceCheck(subgraph.name, false);
           return {
@@ -133,6 +142,9 @@ export class GatewayService {
 
         if (!response.ok) {
           const errorMessage = await response.text();
+          console.error(
+            `Failed to fetch data from ${serviceName}: ${errorMessage}`
+          );
           throw new ServiceError(
             serviceName,
             `Failed to fetch data: ${errorMessage}`,
@@ -246,6 +258,7 @@ export class GatewayService {
         res.json(metrics);
       });
 
+      console.log("=========== APOLLO GATEWAY START ============");
       // Start listening
       const port = process.env.PORT || 4000;
       app.listen(port, () => {
@@ -259,9 +272,9 @@ export class GatewayService {
           `Metrics check endpoint available at http://localhost:${port}/metrics`
         );
       });
-
       // Start watching for service discovery updates
       await this.serviceDiscovery.watchServices();
+      console.log("=========== APOLLO GATEWAY END ============");
     } catch (error) {
       console.error("Failed to start the Gateway:", error);
       throw error;
