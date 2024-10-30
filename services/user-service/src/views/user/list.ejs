@@ -1,0 +1,25 @@
+<% layout('mainlayout') %>
+<h2>User List</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% users.forEach(user => { %>
+            <tr>
+                <td><%= user.id %></td>
+                <td><%= user.name %></td>
+                <td><%= user.email %></td>
+                <td>
+                    <a href="<%= route('admin.user.edit', { id: user.id }) %>">Edit</a>
+                    <a href="<%= route('admin.user.delete', { id: user.id }) %>">Delete</a>
+                </td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>

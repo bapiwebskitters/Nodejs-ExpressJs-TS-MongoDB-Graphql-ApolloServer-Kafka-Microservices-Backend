@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  user-service:
+    build:
+      context: ./services/user-service
+    environment:
+      - MONGO_URI=mongodb://mongo/user-service
+    ports:
+      - "3001:3001"
+
+  product-service:
+    build:
+      context: ./services/product-service
+    environment:
+      - MONGO_URI=mongodb://mongo/product-service
+    ports:
+      - "3002:3002"
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+    environment:
+      - MONGO_URI=mongodb://mongo/notification-service
+    ports:
+      - "3003:3003"
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+    environment:
+      - USER_SERVICE_URL=http://user-service:3001/graphql
+      - PRODUCT_SERVICE_URL=http://product-service:3002/graphql
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3003/graphql
+      - GATEWAY_PORT=4000
+    ports:
+      - "4000:4000"
+    depends_on:
+      - user-service
+      - product-service
+      - notification-service
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
